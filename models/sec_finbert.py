@@ -123,7 +123,7 @@ def fetch_filing_text(filing: dict) -> str:
 
     r.raise_for_status()
 
-    soup = BeautifulSoup(r.content, "lxml")
+    soup = BeautifulSoup(r.content, "html.parser")
     for tag in soup(["script", "style", "meta", "link"]):
         tag.decompose()
     text = re.sub(r"\s+", " ", soup.get_text(separator=" ")).strip()
