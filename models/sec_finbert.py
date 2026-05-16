@@ -121,9 +121,10 @@ def fetch_filing_text(filing: dict) -> str:
         url = "https://www.sec.gov" + links[0]
         r   = requests.get(url, headers=SEC_HEADERS, timeout=30)
 
-    r.raise_for_status()
-
-    soup = BeautifulSoup(r.content, "html.parser")
+    r.raise_for_status() 
+  
+    surowy_html = r.content[:800000] 
+    soup = BeautifulSoup(surowy_html, "html.parser")
     for tag in soup(["script", "style", "meta", "link"]):
         tag.decompose()
     text = re.sub(r"\s+", " ", soup.get_text(separator=" ")).strip()
