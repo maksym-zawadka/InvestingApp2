@@ -202,6 +202,30 @@ def fetch_fundamentals(ticker: str) -> dict:
         "shortName": info.get("shortName", ticker),
     }
 
+@st.cache_data
+def get_sp500_tickers() -> list:
+    """Zwraca zahardcodowaną listę tickerów S&P 500 (szybkie i niezawodne)."""
+    tickers = [
+        "A", "AAL", "AAPL", "ABBV", "ABNB", "ABT", "ACGL", "ACN", "ADBE", "ADI",
+        "ADM", "ADP", "ADSK", "AEE", "AEP", "AES", "AFL", "AIG", "AIZ", "AJG",
+        "AKAM", "ALB", "ALGN", "ALL", "ALLE", "AMAT", "AMCR", "AMD", "AME", "AMGN",
+        "AMP", "AMT", "AMZN", "ANET", "ANSS", "AON", "AOS", "APA", "APD", "APH",
+        "APTV", "ARE", "ATO", "AVGO", "AWK", "AXP", "BA", "BAC", "BK", "BKNG",
+        "BLK", "BMY", "BRK-B", "BSX", "C", "CAT", "CB", "CCI", "CDNS", "CI",
+        "CME", "CMG", "CMI", "COF", "COP", "COST", "CRM", "CRWD", "CSCO", "CSX",
+        "CVS", "CVX", "DHR", "DIS", "DOW", "DUK", "EMR", "EOG", "EPAM", "ETN",
+        "EW", "EXC", "F", "FCX", "FDX", "FI", "FSLR", "GD", "GE", "GILD",
+        "GIS", "GLW", "GM", "GOOG", "GOOGL", "GS", "HAL", "HD", "HON", "HPE",
+        "HPQ", "IBM", "ICE", "INTC", "INTU", "ISRG", "ITW", "JNJ", "JPM", "K",
+        "KHC", "KLAC", "KO", "LIN", "LLY", "LMT", "LOW", "LRCX", "MA", "MAR",
+        "MCD", "MDLZ", "MDT", "MET", "META", "MMM", "MO", "MRK", "MRO", "MS",
+        "MSFT", "MU", "NEE", "NEM", "NFLX", "NKE", "NOC", "NOW", "NVDA", "NXPI",
+        "O", "ORCL", "OXY", "PANW", "PEP", "PFE", "PG", "PGR", "PH", "PLD",
+        "PM", "PNC", "PYPL", "QCOM", "REGN", "RTX", "SBUX", "SCHW", "SLB", "SNPS",
+        "SO", "SPG", "T", "TGT", "TMO", "TMUS", "TSLA", "TXN", "UNH", "UNP",
+        "UPS", "USB", "V", "VZ", "WFC", "WMT", "XOM"
+    ]
+    return sorted(tickers)
 
 @st.cache_data(show_spinner=False, ttl=1800)
 def fetch_news(ticker: str) -> list:
@@ -552,12 +576,30 @@ def trigger_load():
 
 
 # ── Controls ───────────────────────────────────────────────────────────────────
+sp500_list = get_sp500_tickers()
+opcja_reczna = "--- INNY (Wpisz ręcznie) ---"
+pelna_lista = [opcja_reczna] + sp500_list
+
 with st.container():
     #st.markdown('<div class="controls-bar">', unsafe_allow_html=True)
     c1, c2, c3, c4, c5 = st.columns([2, 1.5, 2, 2, 1.5])
     with c1:
-        ticker_input = st.text_input("Ticker", value="AAPL", placeholder="np. TSLA, NVDA",
-                                     on_change=trigger_load).upper()
+        # Domyślnie ustawiamy na NVDA lub AAPL, jeśli są na liście
+        idx_domyslny = pelna_lista.index("NVDA") if "NVDA" in pelna_lista else 1
+
+        wybor_tickera = st.selectbox(
+            "Ticker (Wyszukaj lub wybierz)",
+            options=pelna_lista,
+            index=idx_domyslny,
+            on_change=trigger_load
+        )
+
+        # Jeśli użytkownik wybierze opcję ręczną, pokazujemy standardowe pole tekstowe
+        if wybor_tickera == opcja_reczna:
+            ticker_input = st.text_input("Wpisz własny ticker", placeholder="np. CDR.WA",
+                                         on_change=trigger_load).upper()
+        else:
+            ticker_input = wybor_tickera
     with c2:
         interval_input = st.selectbox("Interwał", ["5m", "15m", "30m", "1h", "1d", "1wk"], index=4)
     with c3:
