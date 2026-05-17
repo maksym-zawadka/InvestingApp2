@@ -585,7 +585,7 @@ with st.container():
     c1, c2, c3, c4, c5 = st.columns([2, 1.5, 2, 2, 1.5])
     with c1:
         # Domyślnie ustawiamy na NVDA lub AAPL, jeśli są na liście
-        idx_domyslny = pelna_lista.index("NVDA") if "NVDA" in pelna_lista else 1
+        idx_domyslny = pelna_lista.index("AAPL") if "NVDA" in pelna_lista else 1
 
         wybor_tickera = st.selectbox(
             "Ticker (Wyszukaj lub wybierz)",
